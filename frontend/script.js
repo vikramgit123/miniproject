@@ -1,11 +1,15 @@
 async function calculateEmployability() {
-  console.log("Submit button clicked!");
-  const selectedSkills = Array.from(document.querySelectorAll('input[name="skill"]:checked'))
-    .map(skill => skill.value);
+  // Get skills from text input and split by commas
+  const skillsInput = document.getElementById('skillsInput').value;
+  const selectedSkills = skillsInput
+  .split(',')
+  .map(skill => skill.trim().toLowerCase())  // Normalize input
+  .filter(skill => skill !== '');
+  
   console.log("Selected Skills:", selectedSkills);
 
   if (selectedSkills.length === 0) {
-    alert("Please select at least one skill!");
+    alert("Please enter at least one skill!");
     return;
   }
 
@@ -15,7 +19,6 @@ async function calculateEmployability() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ skills: selectedSkills })
     });
-    console.log("Response:", response);
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
@@ -26,11 +29,11 @@ async function calculateEmployability() {
 
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = jobs.map(job => `
-      <div>
+      <div class="job-card">
         <h3>${job.title} (${job.sector})</h3>
-        <p>Companies: ${job.companies.join(', ')}</p>
-        <p>Employability Score: ${job.employabilityScore}%</p>
-        <p>Recruitment Process:</p>
+        <p><strong>Companies:</strong> ${job.companies.join(', ')}</p>
+        <p><strong>Employability Score:</strong> ${job.employabilityScore}%</p>
+        <p><strong>Recruitment Process:</strong></p>
         <ul>
           ${job.recruitmentProcess.map(step => `<li>${step}</li>`).join('')}
         </ul>
